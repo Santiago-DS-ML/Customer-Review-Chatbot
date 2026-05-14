@@ -101,7 +101,7 @@ if upload:
         context = "\n".join(
             relevant_reviews
         )
-                prompt = f"""
+        prompt = f"""
         You are a customer insight analyst.
 
         Use these customer reviews

@@ -37,15 +37,49 @@ st.markdown("""
     --font-mono:    'DM Mono', monospace;
 }
 
-/* ── Global reset ───────────────────────────── */
-html, body, [class*="css"] {
-    font-family: var(--font-body) !important;
-    background-color: var(--bg) !important;
+/* ── Global reset — force light text everywhere ─ */
+html, body { background-color: var(--bg) !important; color: var(--text) !important; }
+
+/* Catch ALL Streamlit wrappers: stApp, stMain, stVerticalBlock, etc. */
+.stApp,
+.stApp > *,
+section[data-testid="stMain"],
+section[data-testid="stMain"] > *,
+div[data-testid="stVerticalBlock"],
+div[data-testid="stVerticalBlock"] > *,
+div[data-testid="column"] > *,
+.element-container,
+.element-container > * {
+    background-color: transparent;
     color: var(--text) !important;
+    font-family: var(--font-body) !important;
+}
+
+/* Force text color on every p, span, div, label that Streamlit renders */
+.stApp p,
+.stApp span,
+.stApp div,
+.stApp label,
+.stApp small,
+.stApp li,
+.stApp strong,
+.stApp em,
+[data-testid="stMarkdownContainer"] *,
+[data-testid="stText"] *,
+[data-testid="stCaptionContainer"] * {
+    color: var(--text) !important;
+}
+
+/* Muted / caption text */
+.stApp small,
+[data-testid="stCaptionContainer"] {
+    color: var(--muted) !important;
 }
 
 /* ── App background ─────────────────────────── */
 .stApp { background: var(--bg) !important; }
+section[data-testid="stMain"] { background: var(--bg) !important; }
+div[data-testid="stDecoration"] { display: none; }
 
 /* ── Hide default Streamlit chrome ──────────── */
 #MainMenu, footer, header { visibility: hidden; }
@@ -54,16 +88,78 @@ html, body, [class*="css"] {
     max-width: 1200px;
 }
 
-/* ── SIDEBAR ────────────────────────────────── */
-[data-testid="stSidebar"] {
-    background: var(--surface) !important;
-    border-right: 1px solid var(--border) !important;
+/* ── SIDEBAR — force all text light ─────────── */
+[data-testid="stSidebar"],
+[data-testid="stSidebar"] *,
+[data-testid="stSidebarContent"],
+[data-testid="stSidebarContent"] * {
+    color: var(--text) !important;
 }
-[data-testid="stSidebar"] .block-container {
-    padding: 2rem 1.5rem !important;
+[data-testid="stSidebar"] { background: var(--surface) !important; border-right: 1px solid var(--border) !important; }
+[data-testid="stSidebar"] .block-container { padding: 2rem 1.5rem !important; }
+
+/* ── SELECTBOX — dropdown text ───────────────── */
+[data-testid="stSelectbox"] > div > div {
+    background: var(--card) !important;
+    border: 1px solid var(--border) !important;
+    border-radius: 10px !important;
+}
+[data-testid="stSelectbox"] > div > div > div,
+[data-testid="stSelectbox"] span,
+[data-testid="stSelectbox"] p {
+    color: var(--text) !important;
+}
+[data-testid="stSelectbox"] label {
+    font-size: 0.78rem !important;
+    font-weight: 500 !important;
+    letter-spacing: 0.08em !important;
+    text-transform: uppercase !important;
+    color: var(--muted) !important;
+}
+/* Dropdown overlay list */
+[data-baseweb="popover"] *,
+[data-baseweb="menu"] *,
+[role="listbox"] *,
+[role="option"] {
+    background: var(--card) !important;
+    color: var(--text) !important;
+}
+[role="option"]:hover { background: var(--border) !important; }
+
+/* ── FILE UPLOADER ───────────────────────────── */
+[data-testid="stFileUploader"] {
+    background: var(--card) !important;
+    border: 1.5px dashed var(--border) !important;
+    border-radius: 14px !important;
+    padding: 0.5rem !important;
+    transition: border-color 0.2s;
+}
+[data-testid="stFileUploader"]:hover { border-color: var(--accent) !important; }
+[data-testid="stFileUploader"] *,
+[data-testid="stFileUploaderDropzone"] *,
+[data-testid="stFileUploaderDropzone"] small,
+[data-testid="stFileUploaderDropzone"] span {
+    color: var(--text) !important;
 }
 
-/* Sidebar brand header */
+/* ── BUTTONS ─────────────────────────────────── */
+.stButton > button {
+    background: var(--card) !important;
+    color: var(--text) !important;
+    border: 1px solid var(--border) !important;
+    border-radius: 8px !important;
+    font-family: var(--font-body) !important;
+    font-size: 0.85rem !important;
+    transition: border-color 0.2s, background 0.2s !important;
+}
+.stButton > button:hover {
+    border-color: var(--accent) !important;
+    background: rgba(91,255,194,0.06) !important;
+    color: var(--accent) !important;
+}
+
+/* ── SPINNER text ────────────────────────────── */
+[data-testid="stSpinner"] > div > span { color: var(--text) !important; }
 .sidebar-brand {
     display: flex;
     align-items: center;
@@ -137,37 +233,6 @@ html, body, [class*="css"] {
     color: var(--muted);
     margin: 0;
     letter-spacing: 0.01em;
-}
-
-/* ── UPLOAD ZONE ────────────────────────────── */
-[data-testid="stFileUploader"] {
-    background: var(--card) !important;
-    border: 1.5px dashed var(--border) !important;
-    border-radius: 14px !important;
-    padding: 0.5rem !important;
-    transition: border-color 0.2s;
-}
-[data-testid="stFileUploader"]:hover {
-    border-color: var(--accent) !important;
-}
-[data-testid="stFileUploader"] label {
-    color: var(--muted) !important;
-    font-size: 0.85rem !important;
-}
-
-/* ── SELECTBOX ───────────────────────────────── */
-[data-testid="stSelectbox"] > div > div {
-    background: var(--card) !important;
-    border: 1px solid var(--border) !important;
-    border-radius: 10px !important;
-    color: var(--text) !important;
-}
-[data-testid="stSelectbox"] label {
-    font-size: 0.78rem !important;
-    font-weight: 500 !important;
-    letter-spacing: 0.08em !important;
-    text-transform: uppercase !important;
-    color: var(--muted) !important;
 }
 
 /* ── DATA PREVIEW TABLE ──────────────────────── */

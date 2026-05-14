@@ -1,8 +1,6 @@
 import streamlit as st
 import pandas as pd
 import numpy as np
-import json
-from datetime import datetime
 
 from sentence_transformers import SentenceTransformer
 from sklearn.metrics.pairwise import cosine_similarity
@@ -69,9 +67,12 @@ textarea {
     color: white !important;
 }
 
-/* Sidebar */
-section[data-testid="stSidebar"] {
-    background-color: #161A23;
+/* Boutons */
+.stButton>button {
+    background-color: #D4A017;
+    color: black;
+    border-radius: 10px;
+    border: none;
 }
 
 /* File uploader */
@@ -83,7 +84,7 @@ section[data-testid="stFileUploader"] {
 """, unsafe_allow_html=True)
 
 # ==================================================
-# TITLE
+# TITRE
 # ==================================================
 
 st.title("🤖 ReviewBot")
@@ -115,55 +116,6 @@ def load_model():
 model = load_model()
 
 # ==================================================
-# SESSION STATE
-# ==================================================
-
-if "messages" not in st.session_state:
-
-    st.session_state.messages = []
-
-if "chat_history" not in st.session_state:
-
-    st.session_state.chat_history = []
-
-# ==================================================
-# SIDEBAR
-# ==================================================
-
-st.sidebar.title("📁 Conversations")
-
-# Save conversation button
-if st.sidebar.button("💾 Save Current Conversation"):
-
-    timestamp = datetime.now().strftime(
-        "%Y-%m-%d %H:%M:%S"
-    )
-
-    st.session_state.chat_history.append({
-        "timestamp": timestamp,
-        "messages": st.session_state.messages.copy()
-    })
-
-    st.sidebar.success(
-        "Conversation saved!"
-    )
-
-# Display old conversations
-for idx, chat in enumerate(
-    st.session_state.chat_history
-):
-
-    with st.sidebar.expander(
-        f"Conversation {idx+1} - {chat['timestamp']}"
-    ):
-
-        for msg in chat["messages"]:
-
-            st.write(
-                f"**{msg['role']}** : {msg['content']}"
-            )
-
-# ==================================================
 # FILE UPLOAD
 # ==================================================
 
@@ -171,6 +123,14 @@ upload = st.file_uploader(
     "📂 Upload your customer reviews CSV",
     type=["csv"]
 )
+
+# ==================================================
+# CHAT HISTORY
+# ==================================================
+
+if "messages" not in st.session_state:
+
+    st.session_state.messages = []
 
 # ==================================================
 # MAIN PIPELINE
@@ -221,7 +181,7 @@ if upload:
     )
 
     # ==================================================
-    # DISPLAY CHAT HISTORY
+    # DISPLAY OLD CHAT
     # ==================================================
 
     for message in st.session_state.messages:
@@ -261,62 +221,76 @@ if upload:
 
             st.markdown(question)
 
-        # ==================================================
-        # AI RESPONSE
-        # ==================================================
+        # ==============================================
+        # QUESTION EMBEDDING
+        # ==============================================
+
+        question_embedding = model.encode(
+            [question]
+        )
+
+        # ==============================================
+        # SEMANTIC SEARCH
+        # ==============================================
+
+        similarities = cosine_similarity(
+            question_embedding,
+            review_embeddings
+        )[0]
+
+        # ==============================================
+        # TOP REVIEWS
+        # ==============================================
+
+        top_indices = np.argsort(
+            similarities
+        )[::-1][:5]
+
+        relevant_reviews = []
+
+        for idx in top_indices:
+
+            relevant_reviews.append(
+                reviews[idx]
+            )
+
+        # ==============================================
+        # CONTEXT
+        # ==============================================
+
+        context = "\n".join(
+            relevant_reviews
+        )
+
+        # ==============================================
+        # PROMPT
+        # ==============================================
+
+        prompt = f"""
+        You are a customer insight analyst.
+
+        Use the customer reviews below
+        to answer the user's question.
+
+        Customer Reviews:
+        {context}
+
+        User Question:
+        {question}
+
+        Give a clear and business-oriented answer.
+        """
+
+        # ==============================================
+        # LLM RESPONSE
+        # ==============================================
 
         with st.chat_message("assistant"):
 
             with st.spinner(
-                "🔍 Searching relevant reviews and generating response..."
+                "Analyzing customer feedback..."
             ):
 
-                # Question embedding
-                question_embedding = model.encode(
-                    [question]
-                )
-
-                # Semantic search
-                similarities = cosine_similarity(
-                    question_embedding,
-                    review_embeddings
-                )[0]
-
-                # Top reviews
-                top_indices = np.argsort(
-                    similarities
-                )[::-1][:5]
-
-                relevant_reviews = []
-
-                for idx in top_indices:
-
-                    relevant_reviews.append(
-                        reviews[idx]
-                    )
-
-                # Context
-                context = "\n".join(
-                    relevant_reviews
-                )
-
-                # Prompt
-                prompt = f"""
-                You are a customer insight analyst.
-
-                Use the customer reviews below
-                to answer the user's question.
-
-                Customer Reviews:
-                {context}
-
-                User Question:
-                {question}
-
-                Give a clear and business-oriented answer.
-                """
-
-                # LLM generation
                 response = llm.generate_content(
                     prompt
                 )
@@ -325,9 +299,9 @@ if upload:
 
                 st.markdown(ai_response)
 
-        # ==================================================
-        # SAVE AI MESSAGE
-        # ==================================================
+        # ==============================================
+        # SAVE AI RESPONSE
+        # ==============================================
 
         st.session_state.messages.append(
             {

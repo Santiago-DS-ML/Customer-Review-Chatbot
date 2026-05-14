@@ -247,29 +247,47 @@ div[data-testid="stDecoration"] { display: none; }
     background: transparent !important;
     border: none !important;
     padding: 0 !important;
-    margin-bottom: 1.2rem !important;
+    margin-bottom: 1.4rem !important;
 }
 
-/* User bubble */
-[data-testid="stChatMessage"][data-testid*="user"],
-.stChatMessage:has([data-testid="chatAvatarIcon-user"]) {
-    flex-direction: row-reverse !important;
-}
-
-/* Message content styling */
-[data-testid="stChatMessageContent"] {
-    background: var(--card) !important;
-    border: 1px solid var(--border) !important;
-    border-radius: 14px !important;
-    padding: 0.9rem 1.1rem !important;
+/* ── AI message block — deep blue-slate ──────── */
+[data-testid="stChatMessage"]:has([data-testid="chatAvatarIcon-assistant"]) [data-testid="stChatMessageContent"],
+[data-testid="stChatMessage"]:has([aria-label="assistant avatar"]) [data-testid="stChatMessageContent"] {
+    background: #1A2236 !important;
+    border: 1px solid #2A3A5C !important;
+    border-left: 3px solid var(--accent3) !important;
+    border-radius: 4px 14px 14px 14px !important;
+    padding: 1rem 1.2rem !important;
     font-size: 0.92rem !important;
-    line-height: 1.6 !important;
+    line-height: 1.7 !important;
+}
+[data-testid="stChatMessage"]:has([data-testid="chatAvatarIcon-assistant"]) [data-testid="stChatMessageContent"] *,
+[data-testid="stChatMessage"]:has([aria-label="assistant avatar"]) [data-testid="stChatMessageContent"] *,
+[data-testid="stChatMessage"]:has([data-testid="chatAvatarIcon-assistant"]) [data-testid="stChatMessageContent"] p,
+[data-testid="stChatMessage"]:has([data-testid="chatAvatarIcon-assistant"]) [data-testid="stChatMessageContent"] span,
+[data-testid="stChatMessage"]:has([data-testid="chatAvatarIcon-assistant"]) [data-testid="stChatMessageContent"] li,
+[data-testid="stChatMessage"]:has([data-testid="chatAvatarIcon-assistant"]) [data-testid="stChatMessageContent"] strong {
+    color: #E8EAF0 !important;
 }
 
-/* User messages — tinted */
+/* ── USER message block — warm amber tint ─────── */
+[data-testid="stChatMessage"]:has([data-testid="chatAvatarIcon-user"]) [data-testid="stChatMessageContent"],
 [data-testid="stChatMessage"]:has([aria-label="user avatar"]) [data-testid="stChatMessageContent"] {
-    background: rgba(91, 255, 194, 0.06) !important;
-    border-color: rgba(91, 255, 194, 0.2) !important;
+    background: #221C10 !important;
+    border: 1px solid #3D3010 !important;
+    border-right: 3px solid #F5A623 !important;
+    border-radius: 14px 4px 14px 14px !important;
+    padding: 1rem 1.2rem !important;
+    font-size: 0.92rem !important;
+    line-height: 1.7 !important;
+}
+[data-testid="stChatMessage"]:has([data-testid="chatAvatarIcon-user"]) [data-testid="stChatMessageContent"] *,
+[data-testid="stChatMessage"]:has([aria-label="user avatar"]) [data-testid="stChatMessageContent"] *,
+[data-testid="stChatMessage"]:has([data-testid="chatAvatarIcon-user"]) [data-testid="stChatMessageContent"] p,
+[data-testid="stChatMessage"]:has([data-testid="chatAvatarIcon-user"]) [data-testid="stChatMessageContent"] span,
+[data-testid="stChatMessage"]:has([data-testid="chatAvatarIcon-user"]) [data-testid="stChatMessageContent"] li,
+[data-testid="stChatMessage"]:has([data-testid="chatAvatarIcon-user"]) [data-testid="stChatMessageContent"] strong {
+    color: #F5ECD7 !important;
 }
 
 /* ── CHAT INPUT ──────────────────────────────── */
